@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sandėlys</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+
+        .container {
+            width: 80%;
+            margin: 20px auto;
+            background-color: #fff;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .input-group {
+            margin-bottom: 15px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 10px;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        .buttons {
+            margin-top: 20px;
+        }
+
+        .buttons button {
+            padding: 12px 20px;
+            margin-right: 10px;
+            cursor: pointer;
+            background-color: #5cb85c;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            transition: background-color 0.3s ease;
+        }
+
+        .buttons button:hover {
+            background-color: #449d44;
+        }
+
+        .product-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .product-table th, .product-table td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+
+        .product-table th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+        }
+
+        .product-table tbody tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        #deleteProductBtn {
+            background-color: #d9534f;
+        }
+
+        #deleteProductBtn:hover {
+            background-color: #c9302c;
+        }
+
+        .search-bar {
+            margin-top: 20px;
+        }
+
+        .search-bar input {
+            width: 100%;
+            padding: 10px;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Sandėlys</h2>
+        <div class="input-group">
+            <label for="productName">Pavadinimas:</label>
+            <input type="text" id="productName" class="product-input">
+        </div>
+        <div class="input-group">
+            <label for="productQuantity">Kiekis:</label>
+            <input type="number" id="productQuantity" class="product-input">
+        </div>
+        <div class="buttons">
+            <button id="addProductBtn">Pridėti</button>
+            <button id="deleteProductBtn">Ištrinti</button>
+        </div>
+        <div class="search-bar">
+            <label for="search">Paieška:</label>
+            <input type="text" id="search" oninput="searchProduct()">
+        </div>
+        <div>
+            <h2>Prekių sąrašas</h2>
+            <table class="product-table">
+                <thead>
+                    <tr>
+                        <th>Pavadinimas</th>
+                        <th>Kiekis</th>
+                    </tr>
+                </thead>
+                <tbody id="productTableBody">
+                    <!-- Product rows will be added here -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        // Get references to the input fields and buttons
+        const productNameInput = document.getElementById('productName');
+        const productQuantityInput = document.getElementById('productQuantity');
+        const addProductBtn = document.getElementById('addProductBtn');
+        const deleteProductBtn = document.getElementById('deleteProductBtn');
+		const searchInput = document.getElementById('search');
+        const productTableBody = document.getElementById('productTableBody');
+
+        // Function to get products from local storage
+        function getProducts() {
+            const products = localStorage.getItem('products');
+            return products ? JSON.parse(products) : [];
+        }
+
+        // Function to save products to local storage
+        function saveProducts(products) {
+            localStorage.setItem('products', JSON.stringify(products));
+        }
+
+        // Load products from local storage
+        let products = getProducts();
+
+        // Function to render the product table
+        function renderProductTable(productList) {
+            productTableBody.innerHTML = ''; // Clear the table body
+
+            productList.forEach(product => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${product.pavadinimas}</td>
+                    <td>${product.kiekis}</td>
+                `;
+                productTableBody.appendChild(row);
+            });
+        }
+
+        // Initial render of the product table
+        renderProductTable(products);
+
+        // Function to add a new product
+        function addProduct() {
+            const productName = productNameInput.value;
+            const productQuantity = parseInt(productQuantityInput.value);
+
+            if (productName && !isNaN(productQuantity)) {
+                const newProduct = {
+                    pavadinimas: productName,
+                    kiekis: productQuantity
+                };
+
+                products.push(newProduct);
+                saveProducts(products); // Save to local storage
+                renderProductTable(products);
+
+                // Clear the input fields
+                productNameInput.value = '';
+                productQuantityInput.value = '';
+            } else {
+                alert('Prašome įvesti visus produkto duomenis.');
+            }
+        }
+
+		// Function to search for a product
+		function searchProduct() {
+			const searchTerm = searchInput.value.toLowerCase();
+			const filteredProducts = products.filter(product =>
+				product.pavadinimas.toLowerCase().includes(searchTerm)
+			);
+			renderProductTable(filteredProducts);
+		}
+
+        // Event listeners for the buttons
+        addProductBtn.addEventListener('click', addProduct);
+		searchInput.addEventListener('input', searchProduct);
+
+        // Optional: Implement deleteProduct functionality
+        deleteProductBtn.addEventListener('click', () => {
+            alert('Ištrynimo funkcionalumas dar neįdiegtas.');
+        });
+    </script>
+</body>
+</html>
